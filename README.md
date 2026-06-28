@@ -1,12 +1,3 @@
-## ✅ Revisão do README - APROVADO COM MELHORIAS
-
-O README está bem estruturado e cobre os pontos essenciais. Seguem ajustes pontuais para maior completude:
-
----
-
-## 📝 Versão Revisada (Copiar e Colar)
-
-```markdown
 # 🌿 Raízes do Nordeste - API
 
 API RESTful para gestão da Rede "Raízes do Nordeste" — sistema unificado de pedidos,
