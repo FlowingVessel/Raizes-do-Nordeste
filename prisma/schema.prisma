@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENTE
+  FUNCIONARIO
+  ADMINISTRADOR
+}
+
+enum StatusPedido {
+  AGUARDANDO_PAGAMENTO
+  PAGO
+  CANCELADO
+}
+
+model User {
+  id               String   @id @default(uuid())
+  nome             String
+  email            String   @unique
+  passwordHash     String
+  role             Role     @default(CLIENTE)
+  fidelidadePontos Float    @default(0.0)
+  criadoEm         DateTime @default(now())
+
+  pedidos          Order[]
+
+  @@map("users")
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  nome      String
+  preco     Float
+  descricao String?
+
+  estoques  ProductStock[]
+  itens     OrderItem[]
+
+  @@map("products")
+}
+
+model Unit {
+  id      String @id @default(uuid())
+  nome    String
+  cidade  String
+
+  estoques ProductStock[]
+  pedidos  Order[]
+
+  @@map("units")
+}
+
+model ProductStock {
+  id         String @id @default(uuid())
+  productId  String
+  unitId     String
+  quantidade Int    @default(0)
+
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  unit       Unit    @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, unitId])
+  @@map("product_stocks")
+}
+
+model Order {
+  id             String       @id @default(uuid())
+  userId         String
+  unitId         String
+  formaPagamento String
+  status         StatusPedido @default(AGUARDANDO_PAGAMENTO)
+  total          Float        @default(0.0)
+  criadoEm       DateTime     @default(now())
+
+  usuario        User         @relation(fields: [userId], references: [id])
+  unidade        Unit         @relation(fields: [unitId], references: [id])
+  itens          OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id            String  @id @default(uuid())
+  orderId       String
+  productId     String
+  quantidade    Int
+  precoUnitario Float
+
+  pedido        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  produto       Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
